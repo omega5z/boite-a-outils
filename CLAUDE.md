@@ -47,6 +47,14 @@ Convertit des fichiers en PDF et permet de les visualiser directement dans l'app
 
 Détail complet de la recherche documentaire et plan d'implémentation phasé : [`plans/01-pdf-converter-viewer.md`](plans/01-pdf-converter-viewer.md).
 
+## Dépôt & CI/CD
+
+- Dépôt GitHub public : https://github.com/omega5z/boite-a-outils
+- **CI** (`.github/workflows/ci.yml`) : `flutter analyze` + `flutter test` à chaque push et pull request.
+- **Release** (`.github/workflows/release.yml`) : à chaque push sur `main`, build un APK release signé et le publie sur une release GitHub unique taguée `latest` (le lien de téléchargement reste stable, l'APK est remplacé à chaque fois — pas une nouvelle release par commit).
+- **Signature Android** : keystore persistante générée une fois, stockée en secrets GitHub Actions (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_PASSWORD`, `ANDROID_KEY_ALIAS`) — jamais commitée (`android/.gitignore`). `android/app/build.gradle.kts` lit `android/key.properties` (généré par la CI) s'il existe, sinon retombe sur la signature debug par défaut pour le dev local.
+  - ⚠️ **Sauvegarde locale de la keystore** : `C:\Users\antoa\keystores\boite-a-outils\` (hors du dépôt git). Les secrets GitHub sont write-only — impossible de les relire une fois posés. Si ce dossier est perdu, impossible de republier une mise à jour signée avec la même clé (il faudrait que les utilisateurs désinstallent/réinstallent). À sauvegarder ailleurs (gestionnaire de mots de passe, disque externe).
+
 ## État actuel
 
 **Feature 1 (Convertisseur & Visualiseur PDF) implémentée et vérifiée**, y compris son amélioration post-v1 (sélection multiple d'images + téléchargement, Phase 5) — chaque phase (1 à 5 + vérification finale) a eu une vérification indépendante (analyze, tests, greps anti-patterns, builds réels) qui a confirmé les affirmations de l'agent d'implémentation plutôt que de les prendre pour acquises.
